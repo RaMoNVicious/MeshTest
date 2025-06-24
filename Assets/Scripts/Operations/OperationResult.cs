@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Operations
 {
-    [RequireComponent(typeof(MeshFilter))]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshCollider))]
     public class OperationResult : MonoBehaviour
     {
         [SerializeField]
@@ -13,28 +13,34 @@ namespace Operations
 
         private MeshFilter _meshFilter;
 
+        private MeshCollider _meshCollider;
+
         void Awake()
         {
             _meshFilter = GetComponent<MeshFilter>();
+            _meshCollider = GetComponent<MeshCollider>();
+            
+            booleanObjects.ForEach(item => item.figure.Setup(Join));
+            Join();
         }
 
-        void Update()
+        private void Join()
         {
-            if (Input.GetKeyUp(KeyCode.Space))
-            {
-                Operate();
-            }
+            var result = GetResult(booleanObjects[0], booleanObjects[1]);
+            
+            _meshFilter.sharedMesh = _meshCollider.sharedMesh = result.mesh;
         }
 
-        private void Operate()
-        {
-            if (booleanObjects.Count != 2)
-            {
-                Debug.LogError("Wrong objects count");
-            }
-
-            var result = CSG.Subtract(booleanObjects[0].figure, booleanObjects[1].figure);
-            _meshFilter.sharedMesh = result.mesh;
-        }
+        private static Model GetResult(BooleanObject baseFigure, BooleanObject booleanFigure) =>
+            booleanFigure.operation switch {
+                OperationType.Union => CSG.Union(
+                    baseFigure.figure.gameObject,
+                    booleanFigure.figure.gameObject
+                ),
+                OperationType.Subtract => CSG.Subtract(
+                    baseFigure.figure.gameObject,
+                    booleanFigure.figure.gameObject
+                ),
+            };
     }
 }

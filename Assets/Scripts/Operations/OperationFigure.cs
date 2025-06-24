@@ -6,6 +6,9 @@ namespace Operations
     [RequireComponent(typeof(Collider))]
     public class OperationFigure : MonoBehaviour
     {
+        [SerializeField]
+        private bool isMovable = false;
+        
         private Camera _camera;
 
         private bool _selected;
@@ -14,9 +17,19 @@ namespace Operations
         
         private Vector3 _offset;
 
+        private float _yPosition;
+
+        private Action _onReposition = null;
+
+        public void Setup(Action onReposition)
+        {
+            _onReposition = onReposition;
+        }
+
         void Awake()
         {
             _camera = Camera.main;
+            _yPosition = transform.position.y;
         }
 
         public void Select()
@@ -38,11 +51,11 @@ namespace Operations
                 return;
             }
             
-            _moving = true;
+            _moving = isMovable;
             _offset = gameObject.transform.position - GetMouseXZPosition();
         }
 
-        private void OnMouseUp()
+        void OnMouseUp()
         {
             _moving = false;
         }
@@ -55,11 +68,18 @@ namespace Operations
             }
             
             var position = GetMouseXZPosition();
-            gameObject.transform.position = _offset + new Vector3(
+            var target = _offset + new Vector3(
                 position.x,
-                0f,
+                _yPosition,
                 position.z
             );
+
+            var isRepositioned = Vector3.Distance(transform.position, target) > 0f;
+            transform.position = target;
+            if (isRepositioned)
+            {
+                _onReposition?.Invoke();
+            }
         }
 
         private Vector3 GetMouseXZPosition()
@@ -70,7 +90,7 @@ namespace Operations
             
             return plane.Raycast(ray, out var distance)
                 ? ray.GetPoint(distance)
-                : gameObject.transform.position;
+                : transform.position;
 
         }
     }

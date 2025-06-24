@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine;
+using Operations;
 
 namespace Models
 {
@@ -7,14 +7,13 @@ namespace Models
     [Serializable]
     public class BooleanObject
     {
-        public GameObject figure;
+        public OperationFigure figure;
 
         public OperationType operation;
     }
 
     public enum OperationType
     {
-        Base,
         Union,
         Subtract
     }

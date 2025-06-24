@@ -6,14 +6,7 @@ namespace Cameras
     public class CameraController : MonoBehaviour
     {
         [SerializeField]
-        private Vector2 speedRotation = new Vector2(500f, 200f);
-        
-        private Camera _camera;
-        
-        void Awake()
-        {
-            _camera = Camera.main;
-        }
+        private Vector2 speedRotation = new(500f, 200f);
 
         void Update()
         {
