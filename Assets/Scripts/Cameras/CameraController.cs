@@ -10,7 +10,7 @@ namespace Cameras
 
         void Update()
         {
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(2))
             {
                 var rotation = transform.rotation.eulerAngles;
                 var x = -Input.GetAxis("Mouse Y") * speedRotation.x * Time.deltaTime + rotation.x;
